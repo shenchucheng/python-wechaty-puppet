@@ -28,6 +28,7 @@ from .type import (
     FileBoxOptionsBuffer,
     FileBoxOptionsQrCode,
     FileBoxOptionsBase64,
+    FileBoxOptionsUUID,
     FileBoxOptionsBase,
     Metadata, FileBoxType)
 
@@ -94,6 +95,9 @@ class FileBox:
             else:
                 raise WechatyPuppetConfigurationError(
                     f'Base64 File Data Type is invalid, str/bytes is supported')
+        elif isinstance(options, FileBoxOptionsUUID):
+            self.uuid = options.uuid
+
     @property
     def mimeType(self) -> Optional[str]:
         logger.warn(
@@ -216,6 +220,9 @@ class FileBox:
         elif file_box_type == FileBoxType.Stream:
             with open(file_path, 'wb+') as f:
                 f.write(self.stream)
+
+        elif file_box_type == FileBoxType.UUID:
+            pass
 
     def to_base64(self) -> str:
         """
@@ -344,6 +351,14 @@ class FileBox:
         return cls(options)
 
     @classmethod
+    def from_uuid(cls: Type[FileBox], uuid: str) -> FileBox:
+        """
+        create file-box from uuid
+        """
+        options = FileBoxOptionsUUID(name=f"{uuid}.png", uuid=uuid)
+        return cls(options)
+
+    @classmethod
     def from_json(cls: Type[FileBox], obj: Union[str, dict]) -> FileBox:
         """
         create file-box from json data
@@ -377,6 +392,10 @@ class FileBox:
         elif json_obj['boxType'] == FileBoxType.QRCode.value:
             file_box = FileBox.from_qr_code(
                 qr_code=json_obj['qrCode']
+            )
+        elif json_obj['boxType'] == FileBoxType.UUID.value:
+            file_box = FileBox.from_uuid(
+                uuid=json_obj['uuid']
             )
         else:
             raise ValueError('unknown file_box json object %s',

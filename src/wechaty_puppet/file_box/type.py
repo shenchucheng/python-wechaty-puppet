@@ -52,6 +52,7 @@ class FileBoxType(Enum):
     Buffer = 4
     File = 5
     Stream = 6
+    UUID = 7
 
 
 @dataclass(init=False)
@@ -115,3 +116,12 @@ class FileBoxOptionsBase64(FileBoxOptionsBase):
     """
     base64: bytes = b''
     type: FileBoxType = FileBoxType.Base64
+
+
+@dataclass(init=False)
+class FileBoxOptionsUUID(FileBoxOptionsBase):
+    """
+    base64 file-box options
+    """
+    uuid: str = ""
+    type: FileBoxType = FileBoxType.UUID
